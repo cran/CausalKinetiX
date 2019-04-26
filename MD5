@@ -1,0 +1,17 @@
+1fd4d24263dda859c101c7a2bd018c33 *DESCRIPTION
+81a97aadc3ca167e04a0e940e62b809e *NAMESPACE
+49fbeeaa88a0bc6d1376e466a8e9f4e8 *R/CausalKinetiX.R
+0d1352412c9cf471d736e5fa0f3d400c *R/CausalKinetiX.modelranking.R
+c665074d9007e69e26d7dad9bb905f9d *R/constrained.smoothspline.R
+278ec4db3ac2ef531a558cdb5304360b *R/generate.data.hidden.R
+ec9229ae42bffe9c60112046554af58c *R/generate.data.maillard.R
+371bfc8a4eab5c0734ab8ea8ca7575df *R/generate.data.targetmodel.R
+72eaaca33e262f54f9d78c0d3ab25a9b *R/ode.solver.R
+56a5deefa600479f386ef4614f5c57a1 *R/utils.R
+6c57bdd56cc6ecdfabd6ca052c48d512 *man/CausalKinetiX.Rd
+98316e0bf82accc34399b73ee813dbe5 *man/CausalKinetiX.modelranking.Rd
+6b4699546cc47b7252fb0346c36f74f0 *man/constrained.smoothspline.Rd
+a546df531aeb74a603e7ce4269e0cd1a *man/generate.data.hidden.Rd
+2815b300de72f5aa1484cc30b4bfd9a8 *man/generate.data.maillard.Rd
+92647b821b42f0a274e338e42edd4c3b *man/generate.data.targetmodel.Rd
+71b49e5457c519495a6de898939e899d *man/ode.solver.Rd
