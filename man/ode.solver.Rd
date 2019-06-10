@@ -5,8 +5,8 @@
 \title{ode.solver}
 \usage{
 ode.solver(time_vec, initial_value, times, X, model, target, coefs,
-  included.vars = 1:ncol(X), smooth.type = "smoothing.spline",
-  reltol = 10^(-10), abstol = 10^(-16))
+  smooth.type = "smoothing.spline", reltol = 10^(-10),
+  abstol = 10^(-16))
 }
 \arguments{
 \item{time_vec}{numeric vector. Specifices the points at which to
@@ -31,10 +31,6 @@ to a single term in the mass-action equation.}
 \item{coefs}{numeric vector. Specifies the parameter values for
 each term in \code{model}.}
 
-\item{included.vars}{vector of variables 1 to d. Can be used in
-order to save computational costs if not all variables given in
-\code{X} actually show up in \code{model}.}
-
 \item{smooth.type}{string. Specifies which type of smoothing to
 use. The following options exist: "smoothing.spline", "loess",
 "linear", "constant".}
@@ -56,14 +52,14 @@ For further details see the references.
 \examples{
 
 ## Generate data from Maillard reaction
-simulation.obj <- generate.data.maillard(target=4,
+simulation.obj <- generate.data.maillard(target=11,
                                          env=rep(1:5, each=5),
-                                         L=20)
-
+                                         L=20,
+                                         par.noise=list(noise.sd=0.1,
+                                                        only.target.noise=FALSE,
+                                                        relativ=TRUE))
 D <- simulation.obj$simulated.data
 time <- simulation.obj$time
-env <- simulation.obj$env
-target <- simulation.obj$target
 
 ## Solve for Melanoidin
 X <- do.call(cbind, split(as.vector(t(D[1:5,])), rep(1:11, each=length(unique(time)))))

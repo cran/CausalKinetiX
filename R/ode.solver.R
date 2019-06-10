@@ -18,9 +18,6 @@
 ##' @param target integer specifing which variable is the target.
 ##' @param coefs numeric vector. Specifies the parameter values for
 ##'   each term in \code{model}.
-##' @param included.vars vector of variables 1 to d. Can be used in
-##'   order to save computational costs if not all variables given in
-##'   \code{X} actually show up in \code{model}.
 ##' @param smooth.type string. Specifies which type of smoothing to
 ##'   use. The following options exist: "smoothing.spline", "loess",
 ##'   "linear", "constant".
@@ -43,14 +40,14 @@
 ##' @examples
 ##'
 ##' ## Generate data from Maillard reaction
-##' simulation.obj <- generate.data.maillard(target=4,
+##' simulation.obj <- generate.data.maillard(target=11,
 ##'                                          env=rep(1:5, each=5),
-##'                                          L=20)
-##'
+##'                                          L=20,
+##'                                          par.noise=list(noise.sd=0.1,
+##'                                                         only.target.noise=FALSE,
+##'                                                         relativ=TRUE))
 ##' D <- simulation.obj$simulated.data
 ##' time <- simulation.obj$time
-##' env <- simulation.obj$env
-##' target <- simulation.obj$target
 ##'
 ##' ## Solve for Melanoidin
 ##' X <- do.call(cbind, split(as.vector(t(D[1:5,])), rep(1:11, each=length(unique(time)))))
@@ -61,30 +58,32 @@
 
 
 ode.solver <- function(time_vec, initial_value, times, X, model,
-                       target, coefs, included.vars=1:ncol(X),
-                       smooth.type="smoothing.spline",
+                       target, coefs, smooth.type="smoothing.spline",
                        reltol=10^(-10), abstol=10^(-16)){
+
+  ## Remove all variables not contained in model
+  included.vars <- sort(c(unique(unlist(model)), target))
 
   ## Fit spline on each predictor
   if(smooth.type == "smoothing.spline"){
-    splinefun <- lapply(1:length(included.vars), function(j) smooth.spline(times, X[,j]))
+    splinefun <- lapply(included.vars, function(j) smooth.spline(times, X[,j]))
     splinefun <- lapply(splinefun, function(fit){function(t) predict(fit, t)$y})
   }
   else if(smooth.type == "loess"){
-    splinefun <- lapply(1:length(included.vars), function(j) loess(X[,j] ~ times, span=0.50))
+    splinefun <- lapply(included.vars, function(j) loess(X[,j] ~ times, span=0.50))
     splinefun <- lapply(splinefun, function(fit){function(t) predict(fit, t)})
   }
   else if(smooth.type == "linear"){
-    splinefun <- lapply(1:length(included.vars),
+    splinefun <- lapply(included.vars,
                         function(j) approxfun(times, X[,j], method="linear"))
   }
   else if(smooth.type == "constant"){
-    splinefun <- lapply(1:length(included.vars),
+    splinefun <- lapply(included.vars,
                         function(j) approxfun(times, X[,j], method="constant"))
   }
 
   ## Construct RHS
-  odefun <- function(t, y){
+  odefun <- function(t, y, par){
     deriv <- 0
     for(term in 1:length(model)){
       tmp <- 1
@@ -96,13 +95,13 @@ ode.solver <- function(time_vec, initial_value, times, X, model,
           tmp <- tmp*splinefun[[which(var == included.vars)]](t)
         }
       }
-      deriv <- deriv + coefs[term]*tmp
+      deriv <- deriv + par[term]*tmp
     }
     return(deriv)
   }
 
   ## Solve ODE
-  odefit <- cvode(time_vec, initial_value, odefun, reltol, abstol)
-
+  odefit <- cvode(time_vec, initial_value, odefun, coefs, reltol, abstol)
+  
   return(odefit)
 }
